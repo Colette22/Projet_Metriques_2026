@@ -38,7 +38,11 @@ def mongraphique():
 def monhistogramme():
     return render_template("histogramme.html")
 
-@app.get("/atelier")
+@app.route("/atelier")
+def monatelier():
+    return render_template("atelier.html")
+
+@app.get("/atelier-data")
 def api_atelier():
     url = "https://api.open-meteo.com/v1/forecast?latitude=48.8049&longitude=2.1204&hourly=windspeed_10m"
     response = requests.get(url)
