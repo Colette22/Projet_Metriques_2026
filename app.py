@@ -38,6 +38,22 @@ def mongraphique():
 def monhistogramme():
     return render_template("histogramme.html")
 
+@app.get("/atelier")
+def api_atelier():
+    url = "https://api.open-meteo.com/v1/forecast?latitude=48.8049&longitude=2.1204&hourly=windspeed_10m"
+    response = requests.get(url)
+    data = response.json()
+
+    times = data.get("hourly", {}).get("time", [])
+    winds = data.get("hourly", {}).get("windspeed_10m", [])
+
+    n = min(len(times), len(winds))
+    result = [
+        {"datetime": times[i], "windspeed": winds[i]}
+        for i in range(n)
+    ]
+    return jsonify(result)
+
 # Ne rien mettre après ce commentaire
     
 if __name__ == "__main__":
