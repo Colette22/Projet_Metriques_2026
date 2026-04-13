@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <title>Atelier — Vent Versailles</title>
+  <script src="https://www.gstatic.com/charts/loader.js"></script>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Segoe UI', Arial, sans-serif;
+      background: linear-gradient(135deg, #ffecd2, #fcb69f, #ffd1dc);
+      min-height: 100vh;
+      padding: 40px 24px;
+    }
+    .card {
+      background: white;
+      border-radius: 20px;
+      box-shadow: 0 20px 60px rgba(255,182,193,0.4);
+      padding: 36px;
+      max-width: 1000px;
+      margin: 0 auto;
+    }
+    .header {
+      text-align: center;
+      margin-bottom: 32px;
+    }
+    .emoji { font-size: 52px; animation: sway 2s ease-in-out infinite; display: inline-block; }
+    @keyframes sway {
+      0%   { transform: rotate(-10deg); }
+      50%  { transform: rotate(10deg); }
+      100% { transform: rotate(-10deg); }
+    }
+    h1 { color: #e07a8f; margin-top: 10px; font-size: 28px; }
+    p  { color: #bbb; font-size: 14px; margin-top: 6px; }
+    #chart { width: 100%; height: 480px; }
+    #status {
+      text-align: center;
+      margin-top: 16px;
+      color: #fcb69f;
+      font-weight: 600;
+      font-size: 14px;
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <div class="header">
+      <div class="emoji">🌬️</div>
+      <h1>Vitesse du vent — Versailles</h1>
+      <p>Prévisions horaires pour les 7 prochains jours</p>
+    </div>
+    <div id="chart"></div>
+    <div id="status">Chargement des données...</div>
+  </div>
+
+  <script>
+    google.charts.load('current', { packages: ['corechart'] });
+    google.charts.setOnLoadCallback(drawChart);
+
+    async function drawChart() {
+      const res = await fetch('/atelier');
+      const json = await res.json();
+
+      const data = new google.visualization.DataTable();
+      data.addColumn('string', 'Date/Heure');
+      data.addColumn('number', 'Vent (km/h)');
+
+      json.forEach(p => {
+        data.addRow([p.datetime, p.windspeed]);
+      });
+
+      const options = {
+        title: 'Vitesse du vent à Versailles (km/h)',
+        hAxis: { title: 'Date/Heure', textStyle: { color: '#aaa', fontSize: 11 } },
+        vAxis: { title: 'km/h', textStyle: { color: '#aaa' } },
+        colors: ['#fcb69f'],
+        areaOpacity: 0.4,
+        legend: { position: 'none' },
+        backgroundColor: 'transparent',
+        chartArea: { width: '88%', height: '75%' },
+        titleTextStyle: { color: '#e07a8f', fontSize: 16, bold: true }
+      };
+
+      const chart = new google.visualization.AreaChart(document.getElementById('chart'));
+      chart.draw(data, options);
+      document.getElementById('status').textContent = `✅ ${json.length} points chargés depuis /atelier`;
+    }
+  </script>
+</body>
+</html>
