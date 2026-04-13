@@ -17,73 +17,73 @@
       border-radius: 20px;
       box-shadow: 0 20px 60px rgba(255,182,193,0.4);
       padding: 36px;
-      max-width: 1000px;
+      max-width: 600px;
       margin: 0 auto;
-    }
-    .header {
       text-align: center;
-      margin-bottom: 32px;
     }
     .emoji { font-size: 52px; animation: sway 2s ease-in-out infinite; display: inline-block; }
     @keyframes sway {
-      0%   { transform: rotate(-10deg); }
-      50%  { transform: rotate(10deg); }
-      100% { transform: rotate(-10deg); }
+      0%   { transform: rotate(-15deg); }
+      50%  { transform: rotate(15deg); }
+      100% { transform: rotate(-15deg); }
     }
-    h1 { color: #e07a8f; margin-top: 10px; font-size: 28px; }
-    p  { color: #bbb; font-size: 14px; margin-top: 6px; }
-    #chart { width: 100%; height: 480px; }
+    h1 { color: #e07a8f; margin-top: 10px; font-size: 26px; }
+    p  { color: #bbb; font-size: 14px; margin-top: 6px; margin-bottom: 24px; }
+    #chart { display: inline-block; }
     #status {
-      text-align: center;
       margin-top: 16px;
       color: #fcb69f;
       font-weight: 600;
       font-size: 14px;
     }
+    #current {
+      font-size: 18px;
+      color: #e07a8f;
+      font-weight: 700;
+      margin-top: 8px;
+    }
   </style>
 </head>
 <body>
   <div class="card">
-    <div class="header">
-      <div class="emoji">🌬️</div>
-      <h1>Vitesse du vent — Versailles</h1>
-      <p>Prévisions horaires pour les 7 prochains jours</p>
-    </div>
+    <div class="emoji">🌬️</div>
+    <h1>Vitesse du vent — Versailles</h1>
+    <p>Vent actuel en temps réel</p>
     <div id="chart"></div>
-    <div id="status">Chargement des données...</div>
+    <div id="current"></div>
+    <div id="status">Chargement...</div>
   </div>
 
   <script>
-    google.charts.load('current', { packages: ['corechart'] });
+    google.charts.load('current', { packages: ['gauge'] });
     google.charts.setOnLoadCallback(drawChart);
 
     async function drawChart() {
       const res = await fetch('/atelier-data');
       const json = await res.json();
 
-      const data = new google.visualization.DataTable();
-      data.addColumn('string', 'Date/Heure');
-      data.addColumn('number', 'Vent (km/h)');
+      // On prend la vitesse actuelle (premier point)
+      const current = json[0].windspeed;
 
-      json.forEach(p => {
-        data.addRow([p.datetime, p.windspeed]);
-      });
+      const data = google.visualization.arrayToDataTable([
+        ['Label', 'Value'],
+        ['km/h', current]
+      ]);
 
       const options = {
-        title: 'Vitesse du vent à Versailles (km/h)',
-        hAxis: { title: 'Date/Heure', textStyle: { color: '#aaa', fontSize: 11 } },
-        vAxis: { title: 'km/h', textStyle: { color: '#aaa' } },
-        colors: ['#fcb69f'],
-        areaOpacity: 0.4,
-        legend: { position: 'none' },
-        backgroundColor: 'transparent',
-        chartArea: { width: '88%', height: '75%' },
-        titleTextStyle: { color: '#e07a8f', fontSize: 16, bold: true }
+        width: 400, height: 300,
+        redFrom: 30, redTo: 50,
+        yellowFrom: 15, yellowTo: 30,
+        greenFrom: 0, greenTo: 15,
+        minorTicks: 5,
+        max: 50
       };
 
-      const chart = new google.visualization.AreaChart(document.getElementById('chart'));
+      const chart = new google.visualization.Gauge(document.getElementById('chart'));
       chart.draw(data, options);
-      document.getElementById('status').textContent = `✅ ${json.length} points chargés depuis /atelier`;
+
+      document.getElementById('current').textContent = `Vent actuel : ${current} km/h`;
+      document.getElementById('status').textContent = `✅ Données chargées depuis /atelier-data`;
     }
   </script>
 </body>
