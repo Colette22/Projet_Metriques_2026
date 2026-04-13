@@ -7,7 +7,7 @@
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
       font-family: 'Segoe UI', Arial, sans-serif;
-      background: linear-gradient(135deg, #667eea, #764ba2);
+      background: linear-gradient(135deg, #ffecd2, #fcb69f, #ffd1dc);
       min-height: 100vh;
       display: flex;
       align-items: center;
@@ -17,52 +17,104 @@
       background: white;
       padding: 40px;
       border-radius: 16px;
-      box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+      box-shadow: 0 20px 60px rgba(255,182,193,0.4);
       width: 100%;
       max-width: 480px;
     }
-    h1 { color: #764ba2; margin-bottom: 8px; }
-    p { color: #888; margin-bottom: 24px; font-size: 14px; }
-    label { display: block; font-weight: 600; margin-bottom: 6px; color: #444; }
+    .header {
+      text-align: center;
+      margin-bottom: 24px;
+    }
+    .bird {
+      font-size: 48px;
+      display: inline-block;
+      animation: fly 3s ease-in-out infinite;
+    }
+    @keyframes fly {
+      0%   { transform: translateY(0px) rotate(0deg); }
+      25%  { transform: translateY(-12px) rotate(-8deg); }
+      50%  { transform: translateY(-6px) rotate(4deg); }
+      75%  { transform: translateY(-14px) rotate(-5deg); }
+      100% { transform: translateY(0px) rotate(0deg); }
+    }
+    .bird.sending {
+      animation: sendoff 1s forwards;
+    }
+    @keyframes sendoff {
+      0%   { transform: translateX(0) translateY(0) scale(1); opacity: 1; }
+      100% { transform: translateX(300px) translateY(-200px) scale(0.3); opacity: 0; }
+    }
+    h1 { color: #e07a8f; margin-top: 8px; margin-bottom: 4px; }
+    .subtitle { color: #bbb; font-size: 14px; margin-bottom: 0; }
+    label { display: block; font-weight: 600; margin-bottom: 6px; margin-top: 16px; color: #555; }
     input, textarea {
       width: 100%;
       padding: 12px;
-      border: 2px solid #e0e0e0;
+      border: 2px solid #ffe0ec;
       border-radius: 8px;
       font-size: 15px;
-      margin-bottom: 18px;
       transition: border 0.3s;
     }
     input:focus, textarea:focus {
-      border-color: #764ba2;
+      border-color: #fcb69f;
       outline: none;
     }
-    textarea { height: 120px; resize: vertical; }
+    textarea { height: 120px; resize: vertical; margin-top: 0; }
     button {
       width: 100%;
+      margin-top: 24px;
       padding: 14px;
-      background: linear-gradient(135deg, #667eea, #764ba2);
-      color: white;
+      background: linear-gradient(135deg, #ffe066, #fcb69f, #ffd1dc);
+      color: #7a4a2a;
       border: none;
       border-radius: 8px;
       font-size: 16px;
-      font-weight: 600;
+      font-weight: 700;
       cursor: pointer;
+      transition: opacity 0.3s;
     }
-    button:hover { opacity: 0.9; }
+    button:hover { opacity: 0.85; }
+    .success {
+      display: none;
+      text-align: center;
+      color: #e07a8f;
+      font-weight: 600;
+      margin-top: 16px;
+      font-size: 15px;
+    }
   </style>
 </head>
 <body>
   <div class="card">
-    <h1>✉️ Contactez-moi</h1>
-    <p>Laissez-moi un message, je vous répondrai rapidement.</p>
+    <div class="header">
+      <div class="bird" id="bird">🐦</div>
+      <h1>Contactez-moi</h1>
+      <p class="subtitle">Laissez-moi un message, je vous répondrai rapidement.</p>
+    </div>
     <label>Nom</label>
     <input type="text" placeholder="Votre nom" />
     <label>Prénom</label>
     <input type="text" placeholder="Votre prénom" />
     <label>Message</label>
     <textarea placeholder="Votre message..."></textarea>
-    <button>Envoyer</button>
+    <button onclick="sendMessage()">Envoyer ✉️</button>
+    <p class="success" id="success">Message envoyé ! L'oiseau est parti 🌸</p>
   </div>
+
+  <script>
+    function sendMessage() {
+      const bird = document.getElementById('bird');
+      const success = document.getElementById('success');
+      bird.classList.add('sending');
+      success.style.display = 'block';
+      setTimeout(() => {
+        bird.textContent = '🐦';
+        bird.classList.remove('sending');
+        bird.style.animation = 'none';
+        setTimeout(() => { bird.style.animation = ''; }, 100);
+        success.style.display = 'none';
+      }, 3000);
+    }
+  </script>
 </body>
 </html>
